@@ -4,6 +4,7 @@ import com.dkwondev.stackpedia_v2_api.model.dto.UserDTO;
 import com.dkwondev.stackpedia_v2_api.model.entity.User;
 import com.dkwondev.stackpedia_v2_api.model.mapper.UserMapper;
 import com.dkwondev.stackpedia_v2_api.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDTO> signup(@RequestBody User user) {
+    public ResponseEntity<UserDTO> signup(@Valid @RequestBody User user) {
         User newUser = userService.signup(user);
         return new ResponseEntity<>(userMapper.userToUserDTO(newUser), HttpStatus.CREATED);
     }

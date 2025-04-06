@@ -1,5 +1,6 @@
 package com.dkwondev.stackpedia_v2_api.service;
 
+import com.dkwondev.stackpedia_v2_api.exception.ValidationException;
 import com.dkwondev.stackpedia_v2_api.model.entity.Role;
 import com.dkwondev.stackpedia_v2_api.model.entity.User;
 import com.dkwondev.stackpedia_v2_api.repository.RoleRepository;
@@ -25,6 +26,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User signup(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new ValidationException("Email address already in use");
+        }
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new ValidationException("Username already in use");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByAuthority("USER").get();
         Set<Role> authorities = new HashSet<>();

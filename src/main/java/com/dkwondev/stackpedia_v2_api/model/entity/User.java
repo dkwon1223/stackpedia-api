@@ -1,13 +1,13 @@
 package com.dkwondev.stackpedia_v2_api.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -32,7 +32,8 @@ public class User implements UserDetails {
 
     @NonNull
     @NotEmpty(message = "email cannot be empty")
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
+    @Email(message = "email must be valid")
     private String email;
 
     @NonNull
