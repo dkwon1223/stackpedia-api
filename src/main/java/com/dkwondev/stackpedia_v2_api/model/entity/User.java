@@ -27,7 +27,7 @@ public class User implements UserDetails {
 
     @NonNull
     @NotEmpty(message = "username cannot be empty")
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @NonNull
