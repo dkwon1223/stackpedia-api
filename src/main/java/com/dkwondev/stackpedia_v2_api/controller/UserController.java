@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class UserController {
 
-    private UserService userService;
-    private UserMapper userMapper;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
     @PostMapping("/signup")
     public ResponseEntity<UserDTO> signup(@RequestBody User user) {
