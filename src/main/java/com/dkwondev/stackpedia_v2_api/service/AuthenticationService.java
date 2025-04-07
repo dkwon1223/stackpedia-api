@@ -56,7 +56,7 @@ public class AuthenticationService {
             return new LoginResponseDTO(userMapper.userToUserDTO(userRepository.findByUsername(username).get()), token);
 
         } catch(AuthenticationException e) {
-            return new LoginResponseDTO(null, "");
+            throw e;
         }
     }
 }

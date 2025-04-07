@@ -1,12 +1,11 @@
 package com.dkwondev.stackpedia_v2_api.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
@@ -22,5 +21,32 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        String message = "Authentication failed";
+
+        // Provide more specific messages based on exception type
+        if (ex instanceof BadCredentialsException) {
+            message = "Invalid username or password";
+        } else if (ex instanceof LockedException) {
+            message = "Account is locked";
+        } else if (ex instanceof DisabledException) {
+            message = "Account is disabled";
+        } else if (ex instanceof AccountExpiredException) {
+            message = "Account has expired";
+        } else if (ex instanceof CredentialsExpiredException) {
+            message = "Credentials have expired";
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
+                message
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 }
