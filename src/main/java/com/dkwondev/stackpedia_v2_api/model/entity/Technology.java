@@ -3,6 +3,7 @@ package com.dkwondev.stackpedia_v2_api.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
@@ -30,7 +31,7 @@ public class Technology {
     @NotEmpty(message = "Technology must have a brief summary")
     private String shortDescription;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     @NonNull
     @NotEmpty(message = "Technology must have a detailed description")
     private String description;
