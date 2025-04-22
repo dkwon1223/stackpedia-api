@@ -2,9 +2,12 @@ package com.dkwondev.stackpedia_v2_api.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,34 +26,41 @@ public class Technology {
 
     @Column(name = "name")
     @NonNull
-    @NotEmpty(message = "Technology name cannot be empty")
+    @NotEmpty(message = "Technology name cannot be empty.")
     private String name;
 
     @Column(name = "shortDescription")
     @NonNull
-    @NotEmpty(message = "Technology must have a brief summary")
+    @NotEmpty(message = "Technology must have a brief summary.")
+    @Size(max = 200, message = "Technology short description must be under 200 characters.")
     private String shortDescription;
 
     @Column(name = "description", columnDefinition = "TEXT")
     @NonNull
-    @NotEmpty(message = "Technology must have a detailed description")
+    @NotEmpty(message = "Technology must have a detailed description.")
     private String description;
 
-    @Column(name = "slug")
+    @Column(name = "slug", unique = true)
     @NonNull
-    @NotEmpty(message = "Technology must have a URL-friendly slug")
+    @NotEmpty(message = "Technology must have a URL-friendly slug.")
+    @Size(min = 3, max = 30, message = "Slug must be between 3-30 characters.")
+    @Pattern(regexp = "^[a-z0-9-]+$", message = "Slug must contain only lowercase letters, numbers, and hyphens.")
     private String slug;
 
     @Column(name = "website_url")
+    @URL(message = "Please provide a valid website URL.")
     private String websiteUrl;
 
     @Column(name = "github_url")
+    @URL(message = "Please provide a valid GitHub URL.")
     private String githubUrl;
 
     @Column(name = "documentation_url")
+    @URL(message = "Please provide a valid documentation URL.")
     private String documentationUrl;
 
     @Column(name = "logo_url")
+    @URL(message = "Please provide a valid logo URL.")
     private String logoUrl;
 
     @Column(name = "updated_at")
