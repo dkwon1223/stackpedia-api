@@ -6,13 +6,16 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "category")
 @Getter
 @Setter
+@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Category {
 
     @Id
@@ -37,5 +40,8 @@ public class Category {
     @Size(min = 3, max = 30, message = "Slug must be between 3-30 characters.")
     @Pattern(regexp = "^[a-z0-9-]+$", message = "Slug must contain only lowercase letters, numbers, and hyphens.")
     private String slug;
+
+    @ManyToMany
+    private Set<Technology> technologies = new HashSet<>();
 
 }

@@ -1,7 +1,10 @@
 package com.dkwondev.stackpedia_v2_api.controller;
 
+import com.dkwondev.stackpedia_v2_api.model.dto.category.CategorySimpleDTO;
 import com.dkwondev.stackpedia_v2_api.model.dto.technology.TechnologyDTO;
+import com.dkwondev.stackpedia_v2_api.model.dto.technology.TechnologySimpleDTO;
 import com.dkwondev.stackpedia_v2_api.model.entity.Technology;
+import com.dkwondev.stackpedia_v2_api.model.mapper.CategoryMapper;
 import com.dkwondev.stackpedia_v2_api.model.mapper.TechnologyMapper;
 import com.dkwondev.stackpedia_v2_api.service.TechnologyService;
 import lombok.AllArgsConstructor;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/technology")
@@ -17,6 +21,7 @@ import java.util.List;
 public class TechnologyController {
 
     private final TechnologyMapper technologyMapper;
+    private final CategoryMapper categoryMapper;
     private final TechnologyService technologyService;
 
     @PostMapping
@@ -49,4 +54,25 @@ public class TechnologyController {
         technologyService.deleteTechnology(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping("/{technologyId}/category/{categoryId}")
+    public ResponseEntity<TechnologyDTO> addCategoryToTechnology(@PathVariable Long technologyId, @PathVariable Long categoryId) {
+        return new ResponseEntity<>(technologyMapper.technologyToDTO(technologyService.addCategoryToTechnology(technologyId, categoryId)), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{technologyId}/category/{categoryId}")
+    public ResponseEntity<TechnologyDTO> removeCategoryFromTechnology(@PathVariable Long technologyId, @PathVariable Long categoryId) {
+        return new ResponseEntity<>(technologyMapper.technologyToDTO(technologyService.removeCategoryFromTechnology(technologyId, categoryId)), HttpStatus.OK);
+    }
+
+    @GetMapping("/technologiesByCategory/{categoryId}")
+    public ResponseEntity<Set<TechnologySimpleDTO>> getAllTechnologiesByCategory(@PathVariable Long categoryId) {
+        return new ResponseEntity<>(technologyMapper.technologiesToSimpleDTOs(technologyService.getTechnologiesByCategoryId(categoryId)), HttpStatus.OK);
+    }
+
+    @GetMapping("/categoriesByTechnology/{technologyId}")
+    public ResponseEntity<Set<CategorySimpleDTO>> getAllCategoriesByTechnology(@PathVariable Long technologyId) {
+        return new ResponseEntity<>(categoryMapper.categoriesToSimpleDTOs(technologyService.getCategoriesByTechnologyId(technologyId)), HttpStatus.OK);
+    }
+
 }

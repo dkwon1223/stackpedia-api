@@ -1,10 +1,15 @@
 package com.dkwondev.stackpedia_v2_api.model.dto.technology;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.dkwondev.stackpedia_v2_api.model.dto.category.CategoryDTO;
+import com.dkwondev.stackpedia_v2_api.model.dto.category.CategorySimpleDTO;
+import lombok.*;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TechnologyDTO {
     private Long id;
     private String name;
@@ -15,4 +20,6 @@ public class TechnologyDTO {
     private String githubUrl;
     private String documentationUrl;
     private String logoUrl;
+    private Set<CategorySimpleDTO> categories;
+    private LocalDateTime updatedAt;
 }
