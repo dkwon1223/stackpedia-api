@@ -8,13 +8,13 @@ public interface TechnologyService {
 
     List<Technology> getAllTechnologies();
 
-    Technology getTechnologyById(Long technologyId);
+    Technology getTechnologyById(Long id);
 
     Technology getTechnologyBySlug(String slug);
 
     Technology createTechnology(Technology technology);
 
-    Technology updateTechnology(Long technologyId, Technology technology);
+    Technology updateTechnology(Long id, Technology technology);
 
-    void deleteTechnology(Long technologyId);
+    void deleteTechnology(Long id);
 }

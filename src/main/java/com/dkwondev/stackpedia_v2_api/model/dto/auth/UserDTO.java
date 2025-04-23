@@ -1,4 +1,4 @@
-package com.dkwondev.stackpedia_v2_api.model.dto;
+package com.dkwondev.stackpedia_v2_api.model.dto.auth;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,7 @@
 package com.dkwondev.stackpedia_v2_api.service;
 
 import com.dkwondev.stackpedia_v2_api.exception.ValidationException;
-import com.dkwondev.stackpedia_v2_api.model.dto.LoginResponseDTO;
+import com.dkwondev.stackpedia_v2_api.model.dto.auth.LoginResponseDTO;
 import com.dkwondev.stackpedia_v2_api.model.entity.Role;
 import com.dkwondev.stackpedia_v2_api.model.entity.User;
 import com.dkwondev.stackpedia_v2_api.model.mapper.UserMapper;

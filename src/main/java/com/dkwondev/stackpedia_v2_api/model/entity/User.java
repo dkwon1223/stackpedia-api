@@ -26,18 +26,18 @@ public class User implements UserDetails {
     private Long userId;
 
     @NonNull
-    @NotEmpty(message = "username cannot be empty")
+    @NotEmpty(message = "Username cannot be empty.")
     @Column(name = "username", unique = true)
     private String username;
 
     @NonNull
-    @NotEmpty(message = "email cannot be empty")
+    @NotEmpty(message = "Email cannot be empty.")
     @Column(name = "email", unique = true)
     @Email(message = "email must be valid")
     private String email;
 
     @NonNull
-    @NotEmpty(message = "password cannot be empty")
+    @NotEmpty(message = "Password cannot be empty.")
     @Column(name = "password")
     private String password;
 
