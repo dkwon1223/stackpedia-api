@@ -1,8 +1,8 @@
 package com.dkwondev.stackpedia_v2_api.controller;
 
-import com.dkwondev.stackpedia_v2_api.model.dto.LoginRequestDTO;
-import com.dkwondev.stackpedia_v2_api.model.dto.LoginResponseDTO;
-import com.dkwondev.stackpedia_v2_api.model.dto.UserDTO;
+import com.dkwondev.stackpedia_v2_api.model.dto.auth.LoginRequestDTO;
+import com.dkwondev.stackpedia_v2_api.model.dto.auth.LoginResponseDTO;
+import com.dkwondev.stackpedia_v2_api.model.dto.auth.UserDTO;
 import com.dkwondev.stackpedia_v2_api.model.entity.User;
 import com.dkwondev.stackpedia_v2_api.model.mapper.UserMapper;
 import com.dkwondev.stackpedia_v2_api.service.AuthenticationService;
@@ -18,11 +18,6 @@ public class UserController {
 
     private final AuthenticationService authenticationService;
     private final UserMapper userMapper;
-
-    @GetMapping
-    public ResponseEntity<String> basic() {
-        return new ResponseEntity<>("User based access", HttpStatus.OK);
-    }
 
     @PostMapping("/signup")
     public ResponseEntity<UserDTO> signup(@Valid @RequestBody User user) {

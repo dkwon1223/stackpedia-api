@@ -1,6 +1,6 @@
 package com.dkwondev.stackpedia_v2_api.controller;
 
-import com.dkwondev.stackpedia_v2_api.model.dto.TechnologyDTO;
+import com.dkwondev.stackpedia_v2_api.model.dto.technology.TechnologyDTO;
 import com.dkwondev.stackpedia_v2_api.model.entity.Technology;
 import com.dkwondev.stackpedia_v2_api.model.mapper.TechnologyMapper;
 import com.dkwondev.stackpedia_v2_api.service.TechnologyService;
@@ -19,6 +19,11 @@ public class TechnologyController {
     private final TechnologyMapper technologyMapper;
     private final TechnologyService technologyService;
 
+    @PostMapping
+    public ResponseEntity<TechnologyDTO> createTechnology(@RequestBody Technology technology) {
+        return new ResponseEntity<>(technologyMapper.technologyToDTO(technologyService.createTechnology(technology)), HttpStatus.CREATED);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<TechnologyDTO>> getAllTechnologies() {
         return new ResponseEntity<>(technologyMapper.technologiesToDTOs(technologyService.getAllTechnologies()), HttpStatus.OK);
@@ -30,13 +35,8 @@ public class TechnologyController {
     }
 
     @GetMapping()
-    public ResponseEntity<TechnologyDTO> getTechnologyBySlug(@RequestParam(required = false) String slug) {
+    public ResponseEntity<TechnologyDTO> getTechnologyBySlug(@RequestParam String slug) {
         return new ResponseEntity<>(technologyMapper.technologyToDTO(technologyService.getTechnologyBySlug(slug)), HttpStatus.OK);
-    }
-
-    @PostMapping
-    public ResponseEntity<TechnologyDTO> createTechnology(@RequestBody Technology technology) {
-        return new ResponseEntity<>(technologyMapper.technologyToDTO(technologyService.createTechnology(technology)), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

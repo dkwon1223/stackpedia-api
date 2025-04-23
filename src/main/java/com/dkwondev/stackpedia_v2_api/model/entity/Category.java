@@ -28,7 +28,7 @@ public class Category {
     @Column(name = "description")
     @NonNull
     @NotEmpty(message = "Category must have a brief description")
-    @Size(max = 300, message = "Category description must be 1-300 characters.")
+    @Size(max = 500, message = "Category description must be 1-500 characters.")
     private String description;
 
     @Column(name = "slug")
@@ -37,4 +37,5 @@ public class Category {
     @Size(min = 3, max = 30, message = "Slug must be between 3-30 characters.")
     @Pattern(regexp = "^[a-z0-9-]+$", message = "Slug must contain only lowercase letters, numbers, and hyphens.")
     private String slug;
+
 }

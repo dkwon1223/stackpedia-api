@@ -1,8 +1,10 @@
 package com.dkwondev.stackpedia_v2_api;
 
+import com.dkwondev.stackpedia_v2_api.model.entity.Category;
 import com.dkwondev.stackpedia_v2_api.model.entity.Role;
 import com.dkwondev.stackpedia_v2_api.model.entity.Technology;
 import com.dkwondev.stackpedia_v2_api.model.entity.User;
+import com.dkwondev.stackpedia_v2_api.repository.CategoryRepository;
 import com.dkwondev.stackpedia_v2_api.repository.RoleRepository;
 import com.dkwondev.stackpedia_v2_api.repository.TechnologyRepository;
 import com.dkwondev.stackpedia_v2_api.repository.UserRepository;
@@ -25,7 +27,7 @@ public class StackpediaV2ApiApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(RoleRepository roleRepository, UserRepository userRepository, TechnologyRepository technologyRepository, PasswordEncoder passwordEncoder) {
+	CommandLineRunner run(RoleRepository roleRepository, UserRepository userRepository, TechnologyRepository technologyRepository, CategoryRepository categoryRepository, PasswordEncoder passwordEncoder) {
 		return args -> {
 			Role adminRole = roleRepository.save(new Role("ADMIN"));
 			Role userRole = roleRepository.save(new Role("USER"));
@@ -52,6 +54,9 @@ public class StackpediaV2ApiApplication {
 					"Spring Boot also provides production-ready features like health checks, metrics, and externalized configuration, making it easier to deploy your applications to various environments.\n" +
 					"To get started with Spring Boot, developers typically use the Spring Initializer (start.spring.io) to generate a project structure with the necessary dependencies for their specific needs.", "spring-boot");
 			technologyRepository.saveAll(List.of(react, springBoot));
+
+			Category frontendLibrary = new Category("Frontend Library", "Frontend libraries are reusable code collections that simplify UI development by providing pre-built components and tools. They handle DOM manipulation, state management, and user interactions while offering consistent rendering across browsers. Modern frontend libraries employ component-based architecture and virtual DOM concepts to improve performance and developer experience.", "frontend-library");
+			categoryRepository.save(frontendLibrary);
 		};
 	}
 }

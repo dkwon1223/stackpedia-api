@@ -3,14 +3,16 @@ package com.dkwondev.stackpedia_v2_api.service;
 import com.dkwondev.stackpedia_v2_api.model.entity.Technology;
 import com.dkwondev.stackpedia_v2_api.repository.TechnologyRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@AllArgsConstructor
 @Service
+@AllArgsConstructor
+@Transactional
 public class TechnologyServiceImpl implements TechnologyService {
 
     private final TechnologyRepository technologyRepository;
@@ -21,8 +23,8 @@ public class TechnologyServiceImpl implements TechnologyService {
     }
 
     @Override
-    public Technology getTechnologyById(Long technologyId) {
-        return unwrapTechnology(technologyRepository.findById(technologyId), technologyId);
+    public Technology getTechnologyById(Long id) {
+        return unwrapTechnology(technologyRepository.findById(id));
     }
 
     @Override
@@ -40,8 +42,8 @@ public class TechnologyServiceImpl implements TechnologyService {
     }
 
     @Override
-    public Technology updateTechnology(Long technologyId, Technology technology) {
-        return technologyRepository.findById(technologyId)
+    public Technology updateTechnology(Long id, Technology technology) {
+        return technologyRepository.findById(id)
                 .map(existingTech -> {
                     existingTech.setName(technology.getName());
                     existingTech.setShortDescription(technology.getShortDescription());
@@ -53,19 +55,19 @@ public class TechnologyServiceImpl implements TechnologyService {
                     existingTech.setLogoUrl(technology.getLogoUrl());
                     return technologyRepository.save(existingTech);
                 })
-                .orElseThrow(() -> new EntityNotFoundException("Technology with id:" + technologyId + " does not exist"));
+                .orElseThrow(() -> new EntityNotFoundException("Technology with id:" + id + " does not exist"));
     }
 
 
     @Override
-    public void deleteTechnology(Long technologyId) {
-        unwrapTechnology(technologyRepository.findById(technologyId), technologyId);
-        technologyRepository.deleteById(technologyId);
+    public void deleteTechnology(Long id) {
+        unwrapTechnology(technologyRepository.findById(id));
+        technologyRepository.deleteById(id);
     }
 
-    static Technology unwrapTechnology(Optional<Technology> entity, Long technologyId) {
-        if (entity.isPresent()) {
-            return entity.get();
+    static Technology unwrapTechnology(Optional<Technology> technology) {
+        if (technology.isPresent()) {
+            return technology.get();
         } else {
             throw new EntityNotFoundException("Technology not found.");
         }
