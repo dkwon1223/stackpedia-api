@@ -9,13 +9,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "technology")
 @Getter
 @Setter
-@AllArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 public class Technology {
 
@@ -66,5 +68,24 @@ public class Technology {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "technology_category",
+        joinColumns = @JoinColumn(name = "technology_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
+
+    // Technology to Category helper methods
+    public void addCategory(Category category) {
+        this.categories.add(category);
+        category.getTechnologies().add(this);
+    }
+
+    public void removeCategory(Category category) {
+        this.categories.remove(category);
+        category.getTechnologies().remove(this);
+    }
 
 }

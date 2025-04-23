@@ -58,7 +58,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.deleteById(id);
     }
 
-    static Category unwrap(Optional<Category> category) {
+    public static Category unwrap(Optional<Category> category) {
         if (category.isPresent()) {
             return category.get();
         } else {

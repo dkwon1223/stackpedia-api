@@ -26,13 +26,7 @@ public class CategoryController {
 
     @GetMapping("/all")
     ResponseEntity<List<CategoryDTO>> findAllCategories() {
-
-        List<CategoryDTO> allCategories = categoryService.getAllCategories()
-                .stream()
-                .map(categoryMapper::categoryToDTO)
-                .toList();
-
-        return new ResponseEntity<>(allCategories, HttpStatus.OK);
+        return new ResponseEntity<>(categoryMapper.categoriesToDTOs(categoryService.getAllCategories()), HttpStatus.OK);
     }
 
     @GetMapping()
