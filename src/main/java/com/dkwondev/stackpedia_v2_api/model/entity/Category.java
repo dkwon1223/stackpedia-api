@@ -41,7 +41,7 @@ public class Category {
     @Pattern(regexp = "^[a-z0-9-]+$", message = "Slug must contain only lowercase letters, numbers, and hyphens.")
     private String slug;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "categories")
     private Set<Technology> technologies = new HashSet<>();
 
 }
