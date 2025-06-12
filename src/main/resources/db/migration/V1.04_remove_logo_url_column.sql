@@ -1,0 +1,1 @@
+ALTER TABLE technology DROP COLUMN logo_url;

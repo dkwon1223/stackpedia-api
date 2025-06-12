@@ -61,10 +61,6 @@ public class Technology {
     @URL(message = "Please provide a valid documentation URL.")
     private String documentationUrl;
 
-    @Column(name = "logo_url")
-    @URL(message = "Please provide a valid logo URL.")
-    private String logoUrl;
-
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;

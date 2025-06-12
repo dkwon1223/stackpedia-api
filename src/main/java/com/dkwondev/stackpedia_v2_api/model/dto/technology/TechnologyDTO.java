@@ -19,7 +19,6 @@ public class TechnologyDTO {
     private String websiteUrl;
     private String githubUrl;
     private String documentationUrl;
-    private String logoUrl;
     private Set<CategorySimpleDTO> categories;
     private LocalDateTime updatedAt;
 }

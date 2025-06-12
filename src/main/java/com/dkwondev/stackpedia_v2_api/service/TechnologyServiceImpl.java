@@ -56,7 +56,6 @@ public class TechnologyServiceImpl implements TechnologyService {
                     existingTech.setWebsiteUrl(technology.getWebsiteUrl());
                     existingTech.setGithubUrl(technology.getGithubUrl());
                     existingTech.setDocumentationUrl(technology.getDocumentationUrl());
-                    existingTech.setLogoUrl(technology.getLogoUrl());
                     return technologyRepository.save(existingTech);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Technology with id:" + id + " does not exist"));
