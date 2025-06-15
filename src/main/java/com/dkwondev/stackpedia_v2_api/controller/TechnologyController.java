@@ -31,7 +31,7 @@ public class TechnologyController {
 
     @GetMapping("/all")
     public ResponseEntity<List<TechnologyDTO>> getAllTechnologies() {
-        return new ResponseEntity<>(technologyMapper.technologiesToDTOs(technologyService.getAllTechnologies()), HttpStatus.OK);
+        return new ResponseEntity<>(technologyMapper.technologiesToListDTOs(technologyService.getAllTechnologies()), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -66,8 +66,8 @@ public class TechnologyController {
     }
 
     @GetMapping("/technologiesByCategory/{categoryId}")
-    public ResponseEntity<Set<TechnologySimpleDTO>> getAllTechnologiesByCategory(@PathVariable Long categoryId) {
-        return new ResponseEntity<>(technologyMapper.technologiesToSimpleDTOs(technologyService.getTechnologiesByCategoryId(categoryId)), HttpStatus.OK);
+    public ResponseEntity<Set<TechnologyDTO>> getAllTechnologiesByCategory(@PathVariable Long categoryId) {
+        return new ResponseEntity<>(technologyMapper.technologiesToSetDTOs(technologyService.getTechnologiesByCategoryId(categoryId)), HttpStatus.OK);
     }
 
     @GetMapping("/categoriesByTechnology/{technologyId}")

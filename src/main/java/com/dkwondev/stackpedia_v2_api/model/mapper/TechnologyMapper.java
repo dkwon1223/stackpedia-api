@@ -13,6 +13,7 @@ public interface TechnologyMapper {
     TechnologyDTO technologyToDTO(Technology technology);
     Technology toEntity(TechnologyDTO technologyDTO);
 
-    List<TechnologyDTO> technologiesToDTOs(List<Technology> technologies);
+    List<TechnologyDTO> technologiesToListDTOs(List<Technology> technologies);
+    Set<TechnologyDTO> technologiesToSetDTOs(Set<Technology> technologies);
     Set<TechnologySimpleDTO> technologiesToSimpleDTOs(Set<Technology> technologies);
 }
