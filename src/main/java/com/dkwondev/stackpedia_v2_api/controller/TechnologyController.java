@@ -2,7 +2,6 @@ package com.dkwondev.stackpedia_v2_api.controller;
 
 import com.dkwondev.stackpedia_v2_api.model.dto.category.CategorySimpleDTO;
 import com.dkwondev.stackpedia_v2_api.model.dto.technology.TechnologyDTO;
-import com.dkwondev.stackpedia_v2_api.model.dto.technology.TechnologySimpleDTO;
 import com.dkwondev.stackpedia_v2_api.model.entity.Technology;
 import com.dkwondev.stackpedia_v2_api.model.mapper.CategoryMapper;
 import com.dkwondev.stackpedia_v2_api.model.mapper.TechnologyMapper;
