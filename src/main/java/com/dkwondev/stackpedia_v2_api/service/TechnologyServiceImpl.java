@@ -23,7 +23,7 @@ public class TechnologyServiceImpl implements TechnologyService {
 
     @Override
     public List<Technology> getAllTechnologies() {
-        return technologyRepository.findAll();
+        return technologyRepository.findAllByOrderByNameAsc();
     }
 
     @Override
