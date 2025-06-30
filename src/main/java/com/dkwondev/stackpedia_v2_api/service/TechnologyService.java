@@ -4,6 +4,7 @@ import com.dkwondev.stackpedia_v2_api.model.entity.Category;
 import com.dkwondev.stackpedia_v2_api.model.entity.Technology;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface TechnologyService {
@@ -19,6 +20,8 @@ public interface TechnologyService {
     Technology createTechnology(Technology technology);
 
     Technology updateTechnology(Long id, Technology technology);
+
+    Technology patchTechnology(Long id, Map<String, Object> updates);
 
     void deleteTechnology(Long id);
 
