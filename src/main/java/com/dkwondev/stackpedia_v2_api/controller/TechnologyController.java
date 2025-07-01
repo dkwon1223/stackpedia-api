@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -46,6 +47,12 @@ public class TechnologyController {
     @PutMapping("/{id}")
     public ResponseEntity<TechnologyDTO> updateTechnology(@PathVariable Long id, @RequestBody Technology technology) {
         return new ResponseEntity<>(technologyMapper.technologyToDTO(technologyService.updateTechnology(id, technology)), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<TechnologyDTO> patchTechnology(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        Technology updatedTech = technologyService.patchTechnology(id, updates);
+        return new ResponseEntity<>(technologyMapper.technologyToDTO(updatedTech), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

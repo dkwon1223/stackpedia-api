@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -59,6 +60,55 @@ public class TechnologyServiceImpl implements TechnologyService {
                     return technologyRepository.save(existingTech);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Technology with id:" + id + " does not exist"));
+    }
+
+    @Override
+    public Technology patchTechnology(Long id, Map<String, Object> updates) {
+        Technology existingTech = unwrapTechnology(technologyRepository.findById(id));
+
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name":
+                    if (value instanceof String) {
+                        existingTech.setName((String) value);
+                    }
+                    break;
+                case "shortDescription":
+                    if (value instanceof String) {
+                        existingTech.setShortDescription((String) value);
+                    }
+                    break;
+                case "description":
+                    if (value instanceof String) {
+                        existingTech.setDescription((String) value);
+                    }
+                    break;
+                case "slug":
+                    if (value instanceof String) {
+                        existingTech.setSlug((String) value);
+                    }
+                    break;
+                case "websiteUrl":
+                    if (value instanceof String || value == null) {
+                        existingTech.setWebsiteUrl((String) value);
+                    }
+                    break;
+                case "githubUrl":
+                    if (value instanceof String || value == null) {
+                        existingTech.setGithubUrl((String) value);
+                    }
+                    break;
+                case "documentationUrl":
+                    if (value instanceof String || value == null) {
+                        existingTech.setDocumentationUrl((String) value);
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Field '" + field + "' is not supported.");
+            }
+        });
+
+        return technologyRepository.save(existingTech);
     }
 
 
