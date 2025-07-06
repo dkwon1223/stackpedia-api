@@ -12,7 +12,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
+repomix-output.xml
 ### IntelliJ IDEA ###
 .idea
 *.iws
