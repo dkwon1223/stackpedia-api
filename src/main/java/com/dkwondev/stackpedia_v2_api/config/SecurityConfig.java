@@ -63,6 +63,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                     .requestMatchers("/api/user/signup").permitAll()
                     .requestMatchers("/api/user/login").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
