@@ -27,8 +27,8 @@ public class StackController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StackDTO> getStackById(@PathVariable Long stackId) {
-        return new ResponseEntity<>(stackMapper.stackToStackDTO(stackService.getStackById(stackId)), HttpStatus.OK);
+    public ResponseEntity<StackDTO> getStackById(@PathVariable Long id) {
+        return new ResponseEntity<>(stackMapper.stackToStackDTO(stackService.getStackById(id)), HttpStatus.OK);
     }
 
     @GetMapping

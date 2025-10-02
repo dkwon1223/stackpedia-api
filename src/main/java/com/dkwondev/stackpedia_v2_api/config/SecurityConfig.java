@@ -71,7 +71,21 @@ public class SecurityConfig {
                     .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                    .jwt(Customizer.withDefaults()))
+                    .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                    .bearerTokenResolver(request -> {
+                        String method = request.getMethod();
+                        String path = request.getRequestURI();
+                        // Don't process bearer tokens for public GET endpoints
+                        if ("GET".equals(method) && path.startsWith("/api/")) {
+                            return null;
+                        }
+                        // Extract bearer token for other requests
+                        String authorization = request.getHeader("Authorization");
+                        if (authorization != null && authorization.startsWith("Bearer ")) {
+                            return authorization.substring(7);
+                        }
+                        return null;
+                    }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
