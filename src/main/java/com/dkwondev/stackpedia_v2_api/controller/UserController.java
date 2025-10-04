@@ -30,4 +30,10 @@ public class UserController {
         LoginResponseDTO loginResponse = authenticationService.login(body.getUsername(), body.getPassword());
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        authenticationService.verifyEmail(token);
+        return new ResponseEntity<>("Email verified successfully. You can now log in.", HttpStatus.OK);
+    }
 }

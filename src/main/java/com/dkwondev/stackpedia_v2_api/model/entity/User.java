@@ -1,5 +1,6 @@
 package com.dkwondev.stackpedia_v2_api.model.entity;
 
+import com.dkwondev.stackpedia_v2_api.validation.ValidPassword;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -38,6 +39,7 @@ public class User implements UserDetails {
 
     @NonNull
     @NotEmpty(message = "Password cannot be empty.")
+    @ValidPassword
     @Column(name = "password")
     private String password;
 
@@ -48,6 +50,12 @@ public class User implements UserDetails {
         inverseJoinColumns = {@JoinColumn(name = "role_id")}
     )
     private Set<Role> authorities;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+
+    @Column(name = "enabled")
+    private Boolean enabled = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -71,6 +79,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled != null && enabled;
     }
 }
