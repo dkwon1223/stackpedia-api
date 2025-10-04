@@ -31,7 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category getBySlug(String slug) {
         Category category = categoryRepository.findCategoryBySlug(slug);
         if (category == null) {
-            throw new EntityNotFoundException("Category with slug: " + slug + " not found");
+            throw new EntityNotFoundException("Category with slug: " + slug + " not found.");
         }
         return category;
     }

@@ -59,7 +59,7 @@ public class TechnologyServiceImpl implements TechnologyService {
                     existingTech.setDocumentationUrl(technology.getDocumentationUrl());
                     return technologyRepository.save(existingTech);
                 })
-                .orElseThrow(() -> new EntityNotFoundException("Technology with id:" + id + " does not exist"));
+                .orElseThrow(() -> new EntityNotFoundException("Technology with id:" + id + " does not exist."));
     }
 
     @Override

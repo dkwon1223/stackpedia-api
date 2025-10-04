@@ -1,0 +1,6 @@
+CREATE TABLE stack (
+    stack_id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    slug VARCHAR(30) NOT NULL UNIQUE
+);

@@ -1,5 +1,7 @@
 package com.dkwondev.stackpedia_v2_api.config;
 
+import com.dkwondev.stackpedia_v2_api.oauth2.CustomOAuth2UserService;
+import com.dkwondev.stackpedia_v2_api.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.dkwondev.stackpedia_v2_api.utils.RSAKeyProperties;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -53,7 +55,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   CustomOAuth2UserService customOAuth2UserService,
+                                                   OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -63,15 +67,40 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                     .requestMatchers("/api/user/signup").permitAll()
                     .requestMatchers("/api/user/login").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                    .requestMatchers("/api/user/verify").permitAll()
+                    .requestMatchers("/oauth2/**").permitAll()
+                    .requestMatchers("/login/oauth2/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/user/linked-providers").authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/user/unlink/**").authenticated()
                     .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2 -> oauth2
+                    .userInfoEndpoint(userInfo -> userInfo
+                        .userService(customOAuth2UserService)
+                    )
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                    .jwt(Customizer.withDefaults()))
+                    .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                    .bearerTokenResolver(request -> {
+                        String method = request.getMethod();
+                        String path = request.getRequestURI();
+                        // Don't process bearer tokens for public GET endpoints
+                        if ("GET".equals(method) && path.startsWith("/api/")) {
+                            return null;
+                        }
+                        // Extract bearer token for other requests
+                        String authorization = request.getHeader("Authorization");
+                        if (authorization != null && authorization.startsWith("Bearer ")) {
+                            return authorization.substring(7);
+                        }
+                        return null;
+                    }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
@@ -80,7 +109,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://www.stackpedia.dev", "https://stackpedia.dev"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 
