@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -37,8 +38,6 @@ public class User implements UserDetails {
     @Email(message = "email must be valid")
     private String email;
 
-    @NonNull
-    @NotEmpty(message = "Password cannot be empty.")
     @ValidPassword
     @Column(name = "password")
     private String password;
@@ -56,6 +55,21 @@ public class User implements UserDetails {
 
     @Column(name = "enabled")
     private Boolean enabled = true;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<UserAuthProvider> authProviders = new HashSet<>();
+
+    // Helper method to check if user has a specific auth provider
+    public boolean hasAuthProvider(AuthProvider provider) {
+        return authProviders.stream()
+                .anyMatch(ap -> ap.getProvider() == provider);
+    }
+
+    // Helper method to check if user uses only OAuth (no password)
+    public boolean isOAuthOnly() {
+        return password == null || password.isEmpty();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

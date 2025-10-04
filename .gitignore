@@ -3,6 +3,8 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+OAUTH_IMPLEMENTATION_GUIDE.md
+SECURITY_FEATURES.md
 
 ### STS ###
 .apt_generated

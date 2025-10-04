@@ -1,5 +1,7 @@
 package com.dkwondev.stackpedia_v2_api.config;
 
+import com.dkwondev.stackpedia_v2_api.oauth2.CustomOAuth2UserService;
+import com.dkwondev.stackpedia_v2_api.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.dkwondev.stackpedia_v2_api.utils.RSAKeyProperties;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -53,7 +55,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   CustomOAuth2UserService customOAuth2UserService,
+                                                   OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -64,12 +68,22 @@ public class SecurityConfig {
                     .requestMatchers("/api/user/signup").permitAll()
                     .requestMatchers("/api/user/login").permitAll()
                     .requestMatchers("/api/user/verify").permitAll()
+                    .requestMatchers("/oauth2/**").permitAll()
+                    .requestMatchers("/login/oauth2/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/user/linked-providers").authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/user/unlink/**").authenticated()
                     .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                    .userInfoEndpoint(userInfo -> userInfo
+                        .userService(customOAuth2UserService)
+                    )
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                     .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))

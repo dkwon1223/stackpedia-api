@@ -90,16 +90,24 @@ public class AuthenticationService {
     public LoginResponseDTO login(String username, String password) {
 
         try {
+            // Check if user exists and is OAuth-only
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new ValidationException("Invalid credentials"));
+
+            if (user.isOAuthOnly()) {
+                throw new ValidationException("This account uses OAuth authentication. Please sign in with Google or GitHub.");
+            }
+
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
             String token = tokenService.generateJwt(auth);
 
-            return new LoginResponseDTO(userMapper.userToUserDTO(userRepository.findByUsername(username).get()), token);
+            return new LoginResponseDTO(userMapper.userToUserDTO(user), token);
 
         } catch(AuthenticationException e) {
-            throw e;
+            throw new ValidationException("Invalid credentials");
         }
     }
 }
