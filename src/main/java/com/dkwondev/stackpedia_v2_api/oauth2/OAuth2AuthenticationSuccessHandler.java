@@ -63,20 +63,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     user.getUserId(), user.getUsername(), user.getEmail());
         }
 
-        // Store JWT token in HTTP-only cookie
-        Cookie jwtCookie = new Cookie("jwt", token);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(cookieSecure); // Use configured value
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(24 * 60 * 60); // 24 hours
-
         // Add SameSite attribute via response header (Spring Boot doesn't support SameSite directly on Cookie)
+        // Note: When cookieSecure is false (development), we use SameSite=Lax instead of None
+        // SameSite=None requires Secure flag, which doesn't work with localhost HTTP
+        String sameSite = cookieSecure ? "None" : "Lax";
+
         response.addHeader("Set-Cookie", String.format(
-            "jwt=%s; Path=/; Max-Age=%d; HttpOnly; %s SameSite=None",
-            token, 24 * 60 * 60, cookieSecure ? "Secure;" : ""
+            "jwt=%s; Path=/; Max-Age=%d; HttpOnly; %s SameSite=%s",
+            token, 24 * 60 * 60, cookieSecure ? "Secure;" : "", sameSite
         ));
 
-        log.info("JWT cookie created: secure={}, sameSite=None", cookieSecure);
+        log.info("JWT cookie created: secure={}, sameSite={}", cookieSecure, sameSite);
 
         // Store user info in a separate cookie (non-sensitive, accessible to JS)
         if (user != null) {
@@ -87,8 +84,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
             // Add userInfo cookie with SameSite attribute
             response.addHeader("Set-Cookie", String.format(
-                "userInfo=%s; Path=/; Max-Age=%d; %s SameSite=None",
-                encodedUserInfo, 24 * 60 * 60, cookieSecure ? "Secure;" : ""
+                "userInfo=%s; Path=/; Max-Age=%d; %s SameSite=%s",
+                encodedUserInfo, 24 * 60 * 60, cookieSecure ? "Secure;" : "", sameSite
             ));
 
             log.info("UserInfo cookie created with encoded data");
