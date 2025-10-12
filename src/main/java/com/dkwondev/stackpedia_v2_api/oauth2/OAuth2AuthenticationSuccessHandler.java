@@ -3,6 +3,7 @@ package com.dkwondev.stackpedia_v2_api.oauth2;
 import com.dkwondev.stackpedia_v2_api.model.entity.User;
 import com.dkwondev.stackpedia_v2_api.service.TokenService;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -52,13 +54,29 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             user = ((OAuth2UserPrincipal) oAuth2User).getUser();
         }
 
-        // Build redirect URL with token
-        return UriComponentsBuilder.fromUriString(redirectUri)
-                .queryParam("token", token)
-                .queryParam("userId", user != null ? user.getUserId() : "")
-                .queryParam("username", user != null ? user.getUsername() : "")
-                .queryParam("email", user != null ? user.getEmail() : "")
-                .build()
-                .toUriString();
+        // Store JWT token in HTTP-only cookie
+        Cookie jwtCookie = new Cookie("jwt", token);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true); // Only send over HTTPS
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(24 * 60 * 60); // 24 hours
+        response.addCookie(jwtCookie);
+
+        // Store user info in a separate cookie (non-sensitive, accessible to JS)
+        if (user != null) {
+            String userInfo = String.format("{\"userId\":\"%s\",\"username\":\"%s\",\"email\":\"%s\"}",
+                user.getUserId(), user.getUsername(), user.getEmail());
+            // URL-encode the JSON string to make it cookie-safe
+            String encodedUserInfo = URLEncoder.encode(userInfo, StandardCharsets.UTF_8);
+            Cookie userInfoCookie = new Cookie("userInfo", encodedUserInfo);
+            userInfoCookie.setHttpOnly(false); // Allow JavaScript access for display
+            userInfoCookie.setSecure(true);
+            userInfoCookie.setPath("/");
+            userInfoCookie.setMaxAge(24 * 60 * 60);
+            response.addCookie(userInfoCookie);
+        }
+
+        // Simple redirect without sensitive data in URL
+        return redirectUri;
     }
 }

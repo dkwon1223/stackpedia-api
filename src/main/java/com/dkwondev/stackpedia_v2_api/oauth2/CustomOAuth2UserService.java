@@ -9,16 +9,20 @@ import com.dkwondev.stackpedia_v2_api.repository.RoleRepository;
 import com.dkwondev.stackpedia_v2_api.repository.UserAuthProviderRepository;
 import com.dkwondev.stackpedia_v2_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +49,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         AuthProvider provider = AuthProvider.valueOf(registrationId.toUpperCase());
 
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, oAuth2User.getAttributes());
+
+        // Special handling for GitHub if email is null
+        if ((userInfo.getEmail() == null || userInfo.getEmail().isEmpty()) && "github".equalsIgnoreCase(registrationId)) {
+            String email = fetchGithubPrimaryEmail(userRequest);
+            if (email != null) {
+                // Update the attributes with the fetched email
+                Map<String, Object> modifiedAttributes = new HashMap<>(oAuth2User.getAttributes());
+                modifiedAttributes.put("email", email);
+                userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(registrationId, modifiedAttributes);
+            }
+        }
 
         if (userInfo.getEmail() == null || userInfo.getEmail().isEmpty()) {
             throw new ValidationException("Email not found from OAuth2 provider");
@@ -132,5 +147,40 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         return username;
+    }
+
+    /**
+     * Fetches the primary email from GitHub's /user/emails endpoint
+     * This is needed because GitHub users can set their email to private
+     */
+    private String fetchGithubPrimaryEmail(OAuth2UserRequest userRequest) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(userRequest.getAccessToken().getTokenValue());
+
+            HttpEntity<?> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                "https://api.github.com/user/emails",
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+
+            List<Map<String, Object>> emails = response.getBody();
+            if (emails != null) {
+                // Find the primary email
+                return emails.stream()
+                    .filter(email -> Boolean.TRUE.equals(email.get("primary")))
+                    .map(email -> (String) email.get("email"))
+                    .findFirst()
+                    .orElse(null);
+            }
+        } catch (Exception e) {
+            // Log the error but don't fail the authentication
+            System.err.println("Failed to fetch GitHub emails: " + e.getMessage());
+        }
+        return null;
     }
 }
