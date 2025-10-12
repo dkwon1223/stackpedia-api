@@ -10,6 +10,7 @@ import com.dkwondev.stackpedia_v2_api.repository.EmailVerificationTokenRepositor
 import com.dkwondev.stackpedia_v2_api.repository.RoleRepository;
 import com.dkwondev.stackpedia_v2_api.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserRepository userRepository;
@@ -90,24 +92,37 @@ public class AuthenticationService {
     public LoginResponseDTO login(String username, String password) {
 
         try {
+            log.info("Login attempt for username/email: {}", username);
+
             // Check if user exists and is OAuth-only (try username first, then email)
             User user = userRepository.findByUsername(username)
                     .or(() -> userRepository.findByEmail(username))
-                    .orElseThrow(() -> new ValidationException("Invalid credentials"));
+                    .orElseThrow(() -> {
+                        log.warn("User not found: {}", username);
+                        return new ValidationException("Invalid credentials");
+                    });
+
+            log.info("User found - userId: {}, username: {}, enabled: {}, emailVerified: {}, isOAuthOnly: {}",
+                    user.getUserId(), user.getUsername(), user.isEnabled(),
+                    user.getEmailVerified(), user.isOAuthOnly());
 
             if (user.isOAuthOnly()) {
+                log.warn("OAuth-only account attempted password login: {}", username);
                 throw new ValidationException("This account uses OAuth authentication. Please sign in with Google or GitHub.");
             }
 
+            log.info("Attempting authentication with AuthenticationManager for user: {}", username);
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
+            log.info("Authentication successful for user: {}", username);
             String token = tokenService.generateJwt(auth);
 
             return new LoginResponseDTO(userMapper.userToUserDTO(user), token);
 
         } catch(AuthenticationException e) {
+            log.error("Authentication failed for user: {} - Error: {}", username, e.getMessage());
             throw new ValidationException("Invalid credentials");
         }
     }

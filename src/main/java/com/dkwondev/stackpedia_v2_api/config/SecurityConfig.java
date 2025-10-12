@@ -91,8 +91,14 @@ public class SecurityConfig {
                     .bearerTokenResolver(request -> {
                         String method = request.getMethod();
                         String path = request.getRequestURI();
-                        // Don't process bearer tokens for public GET endpoints
+                        // Don't process bearer tokens for public endpoints
                         if ("GET".equals(method) && path.startsWith("/api/")) {
+                            return null;
+                        }
+                        // Don't process bearer tokens for authentication endpoints
+                        if (path.equals("/api/user/login") ||
+                            path.equals("/api/user/signup") ||
+                            path.equals("/api/user/verify")) {
                             return null;
                         }
                         // First, check Authorization header (for traditional login)
