@@ -31,6 +31,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Value("${app.oauth2.cookie-secure:true}")
     private boolean cookieSecure;
 
+    @Value("${app.oauth2.cookie-domain:#{null}}")
+    private String cookieDomain;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
@@ -68,12 +71,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // SameSite=None requires Secure flag, which doesn't work with localhost HTTP
         String sameSite = cookieSecure ? "None" : "Lax";
 
+        // Build domain attribute if configured
+        String domainAttr = (cookieDomain != null && !cookieDomain.isEmpty())
+            ? String.format("Domain=%s; ", cookieDomain)
+            : "";
+
         response.addHeader("Set-Cookie", String.format(
-            "jwt=%s; Path=/; Max-Age=%d; HttpOnly; %s SameSite=%s",
-            token, 24 * 60 * 60, cookieSecure ? "Secure;" : "", sameSite
+            "jwt=%s; %sPath=/; Max-Age=%d; HttpOnly; %sSameSite=%s",
+            token, domainAttr, 24 * 60 * 60, cookieSecure ? "Secure; " : "", sameSite
         ));
 
-        log.info("JWT cookie created: secure={}, sameSite={}", cookieSecure, sameSite);
+        log.info("JWT cookie created: secure={}, sameSite={}, domain={}", cookieSecure, sameSite, cookieDomain);
 
         // Store user info in a separate cookie (non-sensitive, accessible to JS)
         if (user != null) {
@@ -84,11 +92,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
             // Add userInfo cookie with SameSite attribute
             response.addHeader("Set-Cookie", String.format(
-                "userInfo=%s; Path=/; Max-Age=%d; %s SameSite=%s",
-                encodedUserInfo, 24 * 60 * 60, cookieSecure ? "Secure;" : "", sameSite
+                "userInfo=%s; %sPath=/; Max-Age=%d; %sSameSite=%s",
+                encodedUserInfo, domainAttr, 24 * 60 * 60, cookieSecure ? "Secure; " : "", sameSite
             ));
 
-            log.info("UserInfo cookie created with encoded data");
+            log.info("UserInfo cookie created with encoded data, domain={}", cookieDomain);
         }
 
         log.info("Redirecting to: {}", redirectUri);
