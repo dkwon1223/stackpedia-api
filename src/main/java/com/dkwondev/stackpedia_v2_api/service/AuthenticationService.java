@@ -90,8 +90,9 @@ public class AuthenticationService {
     public LoginResponseDTO login(String username, String password) {
 
         try {
-            // Check if user exists and is OAuth-only
+            // Check if user exists and is OAuth-only (try username first, then email)
             User user = userRepository.findByUsername(username)
+                    .or(() -> userRepository.findByEmail(username))
                     .orElseThrow(() -> new ValidationException("Invalid credentials"));
 
             if (user.isOAuthOnly()) {

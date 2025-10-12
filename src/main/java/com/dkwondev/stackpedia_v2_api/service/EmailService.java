@@ -1,18 +1,25 @@
 package com.dkwondev.stackpedia_v2_api.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${app.email.verification-url}")
+    private String verificationBaseUrl;
+
+    @Value("${app.email.reset-url}")
+    private String resetBaseUrl;
+
     public void sendVerificationEmail(String toEmail, String token) {
-        String verificationUrl = "http://localhost:8080/api/user/verify?token=" + token;
+        String verificationUrl = verificationBaseUrl + "?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
@@ -27,7 +34,7 @@ public class EmailService {
     }
 
     public void sendPasswordResetEmail(String toEmail, String resetToken) {
-        String resetUrl = "http://localhost:8080/api/user/reset-password?token=" + resetToken;
+        String resetUrl = resetBaseUrl + "?token=" + resetToken;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);

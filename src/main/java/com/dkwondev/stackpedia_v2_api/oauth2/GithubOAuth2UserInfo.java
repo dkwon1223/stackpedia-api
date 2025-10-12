@@ -20,7 +20,19 @@ public class GithubOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getEmail() {
-        return (String) attributes.get("email");
+        // GitHub may return email directly in attributes (if public)
+        String email = (String) attributes.get("email");
+
+        // If email is null, it might be because the user has set it to private
+        // In this case, we need to check if there are email objects in the attributes
+        // The email field might be null even with proper scopes if the user's email is private
+        if (email == null || email.isEmpty()) {
+            // GitHub sometimes provides login (username) which we can use as fallback
+            // But we should log this for debugging
+            return null;
+        }
+
+        return email;
     }
 
     @Override

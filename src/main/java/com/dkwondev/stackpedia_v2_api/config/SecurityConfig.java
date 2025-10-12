@@ -9,6 +9,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -94,10 +95,19 @@ public class SecurityConfig {
                         if ("GET".equals(method) && path.startsWith("/api/")) {
                             return null;
                         }
-                        // Extract bearer token for other requests
+                        // First, check Authorization header (for traditional login)
                         String authorization = request.getHeader("Authorization");
                         if (authorization != null && authorization.startsWith("Bearer ")) {
                             return authorization.substring(7);
+                        }
+                        // Second, check cookies (for OAuth2 login)
+                        Cookie[] cookies = request.getCookies();
+                        if (cookies != null) {
+                            for (Cookie cookie : cookies) {
+                                if ("jwt".equals(cookie.getName())) {
+                                    return cookie.getValue();
+                                }
+                            }
                         }
                         return null;
                     }))
