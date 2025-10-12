@@ -58,6 +58,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (existingAuthProvider.isPresent()) {
             // User already linked with this provider
             user = existingAuthProvider.get().getUser();
+            // Eagerly fetch authorities to avoid LazyInitializationException
+            user.getAuthorities().size();
         } else {
             // Check if user exists with this email
             Optional<User> existingUser = userRepository.findByEmail(userInfo.getEmail());
@@ -68,9 +70,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 user.setEmailVerified(true); // OAuth provider verified the email
                 user.setEnabled(true);
                 linkAuthProvider(user, provider, userInfo);
+                // Eagerly fetch authorities to avoid LazyInitializationException
+                user.getAuthorities().size();
             } else {
                 // Create new user
                 user = createNewUser(provider, userInfo);
+                // Authorities are already loaded for newly created users
             }
         }
 
