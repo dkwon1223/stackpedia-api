@@ -20,7 +20,13 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
+        // Password can be null (for OAuth users), but if provided, must meet requirements
         if (password == null) {
+            return true;
+        }
+
+        // If password is provided but empty, reject it
+        if (password.isEmpty()) {
             return false;
         }
 
