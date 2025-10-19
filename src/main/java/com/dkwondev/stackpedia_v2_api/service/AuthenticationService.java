@@ -46,6 +46,10 @@ public class AuthenticationService {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new ValidationException("Username already in use");
         }
+        // Traditional signup requires a password
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new ValidationException("Password is required for traditional signup");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByAuthority("USER").get();
         Set<Role> authorities = new HashSet<>();

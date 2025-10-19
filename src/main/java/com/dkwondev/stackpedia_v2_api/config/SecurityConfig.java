@@ -1,6 +1,7 @@
 package com.dkwondev.stackpedia_v2_api.config;
 
 import com.dkwondev.stackpedia_v2_api.oauth2.CustomOAuth2UserService;
+import com.dkwondev.stackpedia_v2_api.oauth2.OAuth2AuthenticationFailureHandler;
 import com.dkwondev.stackpedia_v2_api.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.dkwondev.stackpedia_v2_api.utils.RSAKeyProperties;
 import com.nimbusds.jose.jwk.JWK;
@@ -58,7 +59,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    CustomOAuth2UserService customOAuth2UserService,
-                                                   OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) throws Exception {
+                                                   OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                                                   OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -85,6 +87,7 @@ public class SecurityConfig {
                         .userService(customOAuth2UserService)
                     )
                     .successHandler(oAuth2AuthenticationSuccessHandler)
+                    .failureHandler(oAuth2AuthenticationFailureHandler)
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                     .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
